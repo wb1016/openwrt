@@ -8,6 +8,7 @@ mediatek_setup_interfaces()
 	local board="$1"
 
 	case $board in
+	edup,rt2980|\
 	abt,asr3000|\
 	cmcc,rax3000m|\
 	h3c,magic-nx30-pro|\
@@ -150,6 +151,12 @@ mediatek_setup_macs()
 	local label_mac=""
 
 	case $board in
+	edup,rt2980)
+		lan_mac=$(mtd_get_mac_binary $part_name 0x2A)
+		wan_mac=$(mtd_get_mac_binary $part_name 0x24)
+		label_mac=$lan_mac
+		local wifi_mac="$(mtd_get_mac_binary $part_name 0x04)"
+		;;
 	acer,predator-w6|\
 	acer,predator-w6d|\
 	acer,vero-w6m)
