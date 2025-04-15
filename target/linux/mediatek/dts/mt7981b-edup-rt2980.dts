@@ -258,8 +258,13 @@
 			};
 
 			partition@580000 {
-			label = "ubi";
-			reg = <0x580000 0x7000000>;
+				label = "ubi";
+				reg = <0x580000 0x4000000>;
+			};
+
+			partition@4580000 {
+				label = "data";
+				reg = <0x4580000 0x2000000>;
 			};
 		};
 	};
