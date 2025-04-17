@@ -83,7 +83,7 @@ define Device/edup_rt2980
   DEVICE_MODEL := RT2980
   DEVICE_DTS := mt7981b-edup-rt2980
   DEVICE_DTS_DIR := ../dts
-  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3 kmod-mt76
   BLOCKSIZE := 128k
   PAGESIZE := 2048
   IMAGES += factory.bin
@@ -95,6 +95,24 @@ define Device/edup_rt2980
   DEVICE_COMPAT_MESSAGE := wip
 endef
 TARGET_DEVICES += edup_rt2980
+
+define Device/edup_rt2980-non_openwrt
+  DEVICE_VENDOR := EDUP
+  DEVICE_MODEL := RT2980 non-OpenWRT
+  DEVICE_DTS := mt7981b-edup-rt2980-non_openwrt
+  DEVICE_DTS_DIR := ../dts
+  DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3 kmod-mt76
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  IMAGES += factory.bin
+  IMAGE_SIZE := 65536k
+  IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  SUPPORTED_DEVICES += mediatek,mt7981-spim-snand-rfb
+  DEVICE_COMPAT_VERSION := 0
+  DEVICE_COMPAT_MESSAGE := wip
+endef
+TARGET_DEVICES += edup_rt2980-non_openwrt
 
 define Device/abt_asr3000
   DEVICE_VENDOR := ABT
