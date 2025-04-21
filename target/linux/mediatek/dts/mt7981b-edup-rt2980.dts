@@ -13,12 +13,12 @@
 
     aliases {
         serial0 = &uart0;
-        label-mac-device = &wan;
+        label-mac-device = &gmac0;
 
-        led-boot = &led_power_red;
-        led-failsafe = &led_power_red;
-        led-running = &led_wan_green;
-        led-upgrade = &led_wan_green;
+        led-boot = &led_status_red;
+		led-failsafe = &led_status_red;
+		led-running = &led_status_green;
+		led-upgrade = &led_status_green;
 
     };
 
@@ -53,7 +53,7 @@
 		led_status_green: green {
 			label = "led_green";
 			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
-			function = LED_FUNCTION_POWER;
+			function = LED_FUNCTION_STATUS;
 			color = <LED_COLOR_ID_GREEN>;
 			trigger-sources = "timer";
 			default-state = "on";
@@ -62,7 +62,7 @@
 		led_status_red: red {
 			label = "led_red";
 			gpios = <&pio 5 GPIO_ACTIVE_LOW>;
-			function = LED_FUNCTION_ATTENTION;
+			function = LED_FUNCTION_STATUS;
 			color = <LED_COLOR_ID_RED>;
 		};
 	};
@@ -79,7 +79,7 @@
 
 	gmac0: mac@0 {
 		compatible = "mediatek,eth-mac";
-		reg = ;
+		reg = <0>;
 		phy-mode = "2500base-x";
 		/* Immortalwrt uses a fixed-link here, OpenWrt typically defines
 		 * the link properties on the switch port connected to the GMAC.
@@ -89,15 +89,15 @@
 
 	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
-		reg = ;
+		reg = <1>;
 		phy-mode = "gmii";
 		/* In OpenWrt, the PHY connection is typically defined in the switch node */
 	};
 
 	mdio: mdio-bus {
 		compatible = "mediatek,ethsys-mdio";
-		#address-cells = ;
-		#size-cells = ;
+		#address-cells = <1>;
+		#size-cells = <1>;
 
 		/*
 		 * The phy0 definition in Immortalwrt seems to be a direct PHY
@@ -129,31 +129,26 @@
 		status = "okay";
 
 		ports {
-			#address-cells = ;
-			#size-cells = ;
+			#address-cells = <1>;
+			#size-cells = <0>;
 
 			port@0 {
-				reg = ;
+				reg = <0>;
 				label = "lan1";
 			};
 
 			port@1 {
-				reg = ;
+				reg = <1>;
 				label = "lan2";
 			};
 
 			port@2 {
-				reg = ;
+				reg = <2>;
 				label = "lan3";
 			};
 
-			port@3 {
-				reg = ;
-				label = "lan4";
-			};
-
-			wan: port@4 {
-				reg = ;
+			wan: port@3 {
+				reg = <3>;
 				label = "wan";
 				/* MAC address from factory if available */
 				nvmem-cell-names = "mac-address";
@@ -161,12 +156,12 @@
 			};
 
 			port@6 {
-				reg = ;
+				reg = <6>;
 				ethernet = <&gmac0>;
 				phy-mode = "2500base-x";
 
 				fixed-link {
-					speed = ;
+					speed = <2500>;
 					full-duplex;
 					pause;
 				};
@@ -183,7 +178,7 @@
 			 * Assuming gmac1 is the CPU port connecting to the switch.
 			 */
 			cpu_port: port@16 { /* Common CPU port number for MT7531 */
-				reg = ;
+				reg = <16>;
 				ethernet = <&gmac1>;
 				phy-mode = "internal"; /* or "gmii" if connected via internal PHY */
 				/* If there's a specific internal PHY node, link it here */
@@ -315,7 +310,7 @@
 &watchdog {
 	status = "okay";
 };
-
+/*
 &wifi {
 	status = "okay";
 	nvmem-cell-names = "eeprom";
@@ -326,3 +321,4 @@
 	status = "okay";
 	mediatek,u3p-dis-msk = <0x1>;
 };
+*/
