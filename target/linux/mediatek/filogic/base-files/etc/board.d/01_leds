@@ -6,10 +6,10 @@ board=$(board_name)
 board_config_update
 
 case $board in
+edup,rt2980n|\
 edup,rt2980)
-	ucidef_set_led_default "all_ctrl" "ALL_CTRL" "ctrl_led_all" "1"
-	ucidef_set_led_default "internet" "INTERNET" "led_internet" "1"
-	ucidef_set_led_default "power_red" "POWER_RED" "led_power" "0"
+	ucidef_set_led_default "green" "GREEN" "led_green" "1"
+	ucidef_set_led_default "red" "RED" "led_red" "0"
 	;;
 abt,asr3000)
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"

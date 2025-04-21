@@ -8,25 +8,47 @@
 #include "mt7981.dtsi"
 
 / {
-    model = "EDUP RT2980";
-    compatible = "edup,rt2980", "mediatek,mt7981";
+	model = "EDUP RT2980 Non-OpenWrt";
+	compatible = "edup,rt2980n", "mediatek,mt7981";
 
-    aliases {
-        serial0 = &uart0;
-        label-mac-device = &wan;
+	aliases {
+		serial0 = &uart0;
+		label-mac-device = &gmac0;
 
-        led-boot = &led_power_red;
-        led-failsafe = &led_power_red;
-        led-running = &led_wan_green;
-        led-upgrade = &led_wan_green;
+		led-boot = &led_status_red;
+		led-failsafe = &led_status_red;
+		led-running = &led_status_green;
+		led-upgrade = &led_status_green;
+	};
 
-    };
+	chosen {
+		stdout-path = "serial0:115200n8";
+		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
+	};
 
-    chosen {
-        stdout-path = "serial0:115200n8";
-		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000";
-    };
+	memory {
+		reg = <0 0x40000000 0 0x10000000>;
+	};
 
+	leds {
+		compatible = "gpio-leds";
+
+		led_status_green: green {
+			label = "led_green";
+			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_GREEN>;
+			trigger-sources = "timer";
+			default-state = "on";
+		};
+
+		led_status_red: red {
+			label = "led_red";
+			gpios = <&pio 5 GPIO_ACTIVE_LOW>;
+			function = LED_FUNCTION_ATTENTION;
+			color = <LED_COLOR_ID_RED>;
+		};
+	};
 
 	gpio-keys {
 		compatible = "gpio-keys";
@@ -47,29 +69,23 @@
 		};
 	};
 
-    leds {
-		compatible = "gpio-leds";
+	/*
+	 * The Immortalwrt DTS uses a "generic,nmbm" node to wrap the SPI NAND
+	 * partitions. OpenWrt typically defines partitions directly under the
+	 * spi-nand node using "fixed-partitions". We will adopt the OpenWrt
+	 * approach and define the partitions directly under spi_nand.
+	 *
+	 * The partition layout from Immortalwrt is preserved, but adjusted
+	 * to fit the OpenWrt "fixed-partitions" structure.
+	 */
+};
 
-		led_status_green: green {
-			label = "led_green";
-			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
-			function = LED_FUNCTION_POWER;
-			color = <LED_COLOR_ID_GREEN>;
-			trigger-sources = "timer";
-			default-state = "on";
-		};
+&uart0 {
+	status = "okay";
+};
 
-		led_status_red: red {
-			label = "led_red";
-			gpios = <&pio 5 GPIO_ACTIVE_LOW>;
-			function = LED_FUNCTION_ATTENTION;
-			color = <LED_COLOR_ID_RED>;
-		};
-	};
-
-    memory {
-        reg = <0 0x40000000 0 0x10000000>;
-    };
+&watchdog {
+	status = "okay";
 };
 
 &eth {
@@ -198,8 +214,7 @@
 	pinctrl-0 = <&spi0_flash_pins>;
 	status = "okay";
 
-	/* ESMT F50L1G41LB (128M) */
-	spi_nand@0 {
+	spi_nand: spi_nand@0 {
 		#address-cells = <1>;
 		#size-cells = <1>;
 		compatible = "spi-nand";
@@ -216,24 +231,15 @@
 		spi-cal-addrlen = <5>;
 		spi-cal-addr = /bits/ 32 <0x0 0x0 0x0 0x0 0x0>;
 
-		mediatek,nmbm;
-		mediatek,bmt-max-ratio = <1>;
-		mediatek,bmt-max-reserved-blocks = <64>;
-
-		partitions {
+		/* ESMT F50L1G41LB (128M) */
+		partitions: partitions {
 			compatible = "fixed-partitions";
-			#address-cells = <1>;
-			#size-cells = <1>;
-
-			partition@0_all {
-				label = "spi0.0";
-				reg = <0x0 0x8000000>;
-				read-only;
-			};
+			#address-cells = ;
+			#size-cells = ;
 
 			partition@0 {
 				label = "BL2";
-				reg = <0x0 0x100000>;
+				reg = <0x00 0x100000>;
 				read-only;
 			};
 
@@ -249,17 +255,13 @@
 
 				nvmem-layout {
 					compatible = "fixed-layout";
-					#address-cells = <1>;
-					#size-cells = <1>;
-
-					eeprom_factory_0: eeprom@0 {
-						reg = <0x0 0x1000>;
-					};
+					#address-cells = ;
+					#size-cells = ;
 
 					macaddr_factory_4: macaddr@4 {
 						compatible = "mac-base";
 						reg = <0x4 0x6>;
-						#nvmem-cell-cells = <1>;
+						#nvmem-cell-cells = ;
 					};
 				};
 			};
@@ -272,12 +274,42 @@
 
 			partition@580000 {
 				label = "ubi";
-				reg = <0x580000 0x4000000>;
+				reg = <0x0580000 0x4000000>;
+				compatible = "linux,ubi";
+
+				volumes {
+					ubi_rootdisk: ubi-volume-fit {
+						volname = "fit";
+					};
+				};
 			};
 
+			/*
+			 * Porting additional partitions.
+			 * These seem specific and might need further investigation for their purpose
+			 * and whether they are necessary or handled differently in OpenWrt.
+			 * Adding them as-is for now, but they might need adjustments or removal.
+			 */
 			partition@4580000 {
-				label = "data";
-				reg = <0x4580000 0x2000000>;
+				label = "pdt_data";
+				reg = <0x4580000 0x0600000>;
+				read-only;
+			};
+
+			partition@4b80000 {
+				label = "pdt_data_1";
+				reg = <0x4b80000 0x0600000>;
+				read-only;
+			};
+
+			partition@5180000 {
+				label = "exp";
+				reg = <0x5180000 0x100000>;
+			};
+
+			partition@5280000 {
+				label = "plugin";
+				reg = <0x5280000 0x2580000>;
 			};
 		};
 	};
@@ -304,25 +336,16 @@
 	};
 };
 
-&uart0 {
-	status = "okay";
-};
-
-&usb_phy {
-	status = "okay";
-};
-
-&watchdog {
-	status = "okay";
-};
-
 &wifi {
 	status = "okay";
-	nvmem-cell-names = "eeprom";
-	nvmem-cells = <&eeprom_factory_0>;
+	mediatek,mtd-eeprom = <&factory 0x0>;
 };
 
-&xhci {
-	status = "okay";
-	mediatek,u3p-dis-msk = <0x1>;
-};
+/*
+ * The Immortalwrt DTS includes an &hnat node. This is related to hardware
+ * NAT acceleration. While OpenWrt supports this, the configuration might
+ * be handled differently or enabled via kernel modules and settings rather
+ * than directly in the DTS in all cases. We will omit this node for now
+ * as it's not present in the basic OpenWrt template and might require
+ * specific OpenWrt subsystem knowledge to port correctly.
+ */

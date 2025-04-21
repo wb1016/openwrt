@@ -9,6 +9,7 @@ mediatek_setup_interfaces()
 
 	case $board in
 	edup,rt2980|\
+	edup,rt2980n|\
 	abt,asr3000|\
 	cmcc,rax3000m|\
 	h3c,magic-nx30-pro|\
