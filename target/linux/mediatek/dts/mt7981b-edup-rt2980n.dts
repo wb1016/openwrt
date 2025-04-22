@@ -171,18 +171,6 @@
 				nvmem-cells = <&macaddr_factory_4 (-2)>;
 			};
 
-			port@6 {
-				reg = <6>;
-				ethernet = <&gmac0>;
-				phy-mode = "2500base-x";
-
-				fixed-link {
-					speed = <2500>;
-					full-duplex;
-					pause;
-				};
-			};
-
 			/*
 			 * The Immortalwrt DTS has gmac1 with phy-mode "gmii" and phy-handle <&phy0>,
 			 * and the gsw node has mediatek,mdio = <&mdio>. This suggests gmac1 connects
@@ -193,12 +181,27 @@
 			 * one of the LAN/WAN ports, and the PHY will be handled by the switch driver.
 			 * Assuming gmac1 is the CPU port connecting to the switch.
 			 */
-			cpu_port: port@16 { /* Common CPU port number for MT7531 */
-				reg = <16>;
-				ethernet = <&gmac1>;
-				phy-mode = "internal"; /* or "gmii" if connected via internal PHY */
-				/* If there's a specific internal PHY node, link it here */
-				/* mediatek,phylink = <&internal_phy_node>; */
+			port@5 {
+				reg = <5>;
+				label = "cpu"; // Standard label for CPU port
+				ethernet = <&gmac1>; // Connects to the GMII MAC
+				phy-mode = "gmii";   // <<< Corrected phy-mode to match gmac1
+				/* Tagging is usually required for DSA CPU ports */
+				mediatek,mtkhea {
+					/* Configure HEA frame headers if needed, often default is fine */
+                };
+            };
+
+			port@6 {
+				reg = <6>;
+				ethernet = <&gmac0>;
+				phy-mode = "2500base-x";
+
+				fixed-link {
+					speed = <2500>;
+					full-duplex;
+					pause;
+				};
 			};
 		};
 	};
