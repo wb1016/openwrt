@@ -106,7 +106,7 @@
 	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
-		phy-mode = "gmii";
+		phy-mode = "rgmii";
 		/* In OpenWrt, the PHY connection is typically defined in the switch node */
 	};
 
@@ -185,7 +185,7 @@
 				reg = <5>;
 				label = "cpu"; // Standard label for CPU port
 				ethernet = <&gmac1>; // Connects to the GMII MAC
-				phy-mode = "gmii";   // <<< Corrected phy-mode to match gmac1
+				phy-mode = "rgmii";   // <<< Corrected phy-mode to match gmac1
 				managed = "in-band-status";
 				/* Tagging is usually required for DSA CPU ports */
 				mediatek,mtkhea {
