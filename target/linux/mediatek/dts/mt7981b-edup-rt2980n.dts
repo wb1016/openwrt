@@ -89,6 +89,8 @@
 };
 
 &eth {
+	pinctrl-names = "default";
+	pinctrl-0 = <&mdio_pins &rgmii1_pins &sgmii0_pins>;
 	status = "okay";
 	mediatek,tx-align;
 	mediatek,rx-align;
@@ -186,7 +188,7 @@
 				label = "cpu"; // Standard label for CPU port
 				ethernet = <&gmac1>; // Connects to the GMII MAC
 				phy-mode = "rgmii";   // <<< Corrected phy-mode to match gmac1
-//				managed = "in-band-status";
+				managed = "in-band-status";
 				/* Tagging is usually required for DSA CPU ports */
 				mediatek,mtkhea {
 					/* Configure HEA frame headers if needed, often default is fine */
@@ -197,7 +199,7 @@
 				reg = <6>;
 				ethernet = <&gmac0>;
 				phy-mode = "2500base-x";
-//				managed = "in-band-status";
+				managed = "in-band-status";
 
 				fixed-link {
 					speed = <2500>;
@@ -332,6 +334,19 @@
 			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
 			drive-strength = <MTK_DRIVE_8mA>;
 			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
+		};
+	};
+	rgmii1_pins: rgmii1-pins {
+		mux {
+			function = "eth"; // Or "rgmii1"
+			groups = "rgmii1"; // Or similar
+		};
+		// Potentially add conf nodes for drive strength/pulls/delays
+	};
+	sgmii0_pins: sgmii0-pins {
+		mux {
+			function = "eth"; // Or "sgmii0"
+			groups = "sgmii0"; // Or similar
 		};
 	};
 };
