@@ -170,7 +170,7 @@
 				label = "cpu"; // Standard label for CPU port
 				ethernet = <&gmac1>; // Connects to the GMII MAC
 				phy-mode = "rgmii";   // <<< Corrected phy-mode to match gmac1
-				managed = "in-band-status";
+//				managed = "in-band-status";
 				/* Tagging is usually required for DSA CPU ports */
 				mediatek,mtkhea {
 					/* Configure HEA frame headers if needed, often default is fine */
@@ -181,7 +181,7 @@
 				reg = <6>;
 				ethernet = <&gmac0>;
 				phy-mode = "2500base-x";
-				managed = "in-band-status";
+//				managed = "in-band-status";
 
 				fixed-link {
 					speed = <2500>;
