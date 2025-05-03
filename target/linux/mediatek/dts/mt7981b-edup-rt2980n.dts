@@ -89,27 +89,25 @@
 };
 
 &eth {
-	pinctrl-names = "default";
-	pinctrl-0 = <&mdio_pins &rgmii1_pins &sgmii0_pins>;
 	status = "okay";
-	mediatek,tx-align;
-	mediatek,rx-align;
 
 	gmac0: mac@0 {
 		compatible = "mediatek,eth-mac";
 		reg = <0>;
 		phy-mode = "2500base-x";
-		/* Immortalwrt uses a fixed-link here, OpenWrt typically defines
-		 * the link properties on the switch port connected to the GMAC.
-		 * We will define the fixed-link on the switch port later.
-		 */
+		fixed-link {
+			speed = <2500>;
+			full-duplex;
+			pause;
+		};
 	};
 
 	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
-		phy-mode = "rgmii";
+		phy-mode = "gmii";
 		/* In OpenWrt, the PHY connection is typically defined in the switch node */
+		phy-handle = <&int_gbe_phy>;
 	};
 
 	mdio: mdio-bus {
@@ -173,33 +171,10 @@
 				nvmem-cells = <&macaddr_factory_4 (-2)>;
 			};
 
-			/*
-			 * The Immortalwrt DTS has gmac1 with phy-mode "gmii" and phy-handle <&phy0>,
-			 * and the gsw node has mediatek,mdio = <&mdio>. This suggests gmac1 connects
-			 * to the switch via a PHY. We need to determine which switch port gmac1
-			 * is connected to and if the PHY needs a separate node definition.
-			 * Based on the OpenWrt template, GMACs are linked to switch ports via the
-			 * 'ethernet' property. We will link gmac1 to a switch port, assuming it's
-			 * one of the LAN/WAN ports, and the PHY will be handled by the switch driver.
-			 * Assuming gmac1 is the CPU port connecting to the switch.
-			 */
-			port@5 {
-				reg = <5>;
-				label = "cpu"; // Standard label for CPU port
-				ethernet = <&gmac1>; // Connects to the GMII MAC
-				phy-mode = "rgmii";   // <<< Corrected phy-mode to match gmac1
-				managed = "in-band-status";
-				/* Tagging is usually required for DSA CPU ports */
-				mediatek,mtkhea {
-					/* Configure HEA frame headers if needed, often default is fine */
-                };
-            };
-
 			port@6 {
 				reg = <6>;
 				ethernet = <&gmac0>;
 				phy-mode = "2500base-x";
-				managed = "in-band-status";
 
 				fixed-link {
 					speed = <2500>;
@@ -334,19 +309,6 @@
 			pins = "SPI0_CLK", "SPI0_MOSI", "SPI0_MISO";
 			drive-strength = <MTK_DRIVE_8mA>;
 			bias-pull-down = <MTK_PUPD_SET_R1R0_11>;
-		};
-	};
-	rgmii1_pins: rgmii1-pins {
-		mux {
-			function = "eth"; // Or "rgmii1"
-			groups = "rgmii1"; // Or similar
-		};
-		// Potentially add conf nodes for drive strength/pulls/delays
-	};
-	sgmii0_pins: sgmii0-pins {
-		mux {
-			function = "eth"; // Or "sgmii0"
-			groups = "sgmii0"; // Or similar
 		};
 	};
 };
