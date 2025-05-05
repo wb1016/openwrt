@@ -90,7 +90,7 @@ define Device/edup_rt2980n
   KERNEL_IN_UBI := 1
   UBOOTENV_IN_UBI := 1
   IMAGE_SIZE := 65536k
-  IMAGES := sysupgrade.itb factory.bin
+  IMAGES := factory.bin
   IMAGE/factory.bin := append-ubi | check-size $$$$(IMAGE_SIZE)
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   KERNEL_INITRAMFS_SUFFIX := -recovery.itb

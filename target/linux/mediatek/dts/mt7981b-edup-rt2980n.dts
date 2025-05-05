@@ -23,7 +23,8 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
+		bootargs-append = " console=ttyS0,115200n1 root=/dev/fit0 rootwait";
+		// bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
 	};
 
 	memory {
@@ -60,24 +61,14 @@
 			debounce-interval = <60>;
 		};
 
-		mesh {
-			label = "mesh";
+		wps {
+			label = "wps";
 			gpios = <&pio 0 GPIO_ACTIVE_LOW>;
-			linux,code = <BTN_9>; /* This might need to be mapped to an appropriate OpenWrt key code if BTN_9 is not standard */
+			linux,code = <KEY_WPS_BUTTON>;
 			linux,input-type = <EV_SW>;
 			debounce-interval = <60>;
 		};
 	};
-
-	/*
-	 * The Immortalwrt DTS uses a "generic,nmbm" node to wrap the SPI NAND
-	 * partitions. OpenWrt typically defines partitions directly under the
-	 * spi-nand node using "fixed-partitions". We will adopt the OpenWrt
-	 * approach and define the partitions directly under spi_nand.
-	 *
-	 * The partition layout from Immortalwrt is preserved, but adjusted
-	 * to fit the OpenWrt "fixed-partitions" structure.
-	 */
 };
 
 &uart0 {
@@ -106,7 +97,6 @@
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
-		/* In OpenWrt, the PHY connection is typically defined in the switch node */
 		phy-handle = <&int_gbe_phy>;
 	};
 
@@ -114,28 +104,13 @@
 		compatible = "mediatek,ethsys-mdio";
 		#address-cells = <1>;
 		#size-cells = <1>;
-
-		/*
-		 * The phy0 definition in Immortalwrt seems to be a direct PHY
-		 * node. In OpenWrt with DSA, PHYs are often managed by the switch
-		 * driver or defined under the MDIO bus if directly accessible
-		 * and needed for specific properties like calibration data.
-		 * We will define the switch under the mdio-bus as seen in the
-		 * OpenWrt template and link the PHY to the switch port if necessary.
-		 */
 	};
 };
 
-/*
- * The Immortalwrt DTS defines a "gsw" node compatible with "mediatek,mt753x".
- * The OpenWrt template uses "mediatek,mt7531" compatible with a "switch" node
- * under the "mdio_bus". We will adopt the OpenWrt style and define the switch
- * node under the mdio-bus with the appropriate compatible string and properties.
- */
 &mdio_bus {
 	switch: switch@1f {
-		compatible = "mediatek,mt7531"; /* Assuming MT7531 based on common usage with MT7981b */
-		reg = <0x1f>;
+		compatible = "mediatek,mt7531";
+		reg = <0x31>;
 		/* Reset GPIO polarity might differ, check board schematics if possible. Assuming ACTIVE_HIGH based on template */
 		reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
 		interrupt-controller;
@@ -225,7 +200,7 @@
 				reg = <0x100000 0x80000>;
 			};
 
-			partition@180000 {
+			factory:partition@180000 {
 				label = "Factory";
 				reg = <0x180000 0x200000>;
 				read-only;
@@ -312,12 +287,12 @@
 		};
 	};
 };
-/*
+
 &wifi {
 	status = "okay";
 	mediatek,mtd-eeprom = <&factory 0x0>;
 };
-*/
+
 /*
  * The Immortalwrt DTS includes an &hnat node. This is related to hardware
  * NAT acceleration. While OpenWrt supports this, the configuration might
