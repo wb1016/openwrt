@@ -8,8 +8,6 @@ mediatek_setup_interfaces()
 	local board="$1"
 
 	case $board in
-	edup,rt2980|\
-	edup,rt2980n|\
 	abt,asr3000|\
 	cmcc,rax3000m|\
 	h3c,magic-nx30-pro|\
@@ -30,6 +28,8 @@ mediatek_setup_interfaces()
 	arcadyan,mozart)
 		ucidef_set_interfaces_lan_wan "lan0 eth1" eth2
 		;;
+	edup,rt2980|\
+	edup,rt2980n|\
 	asus,rt-ax59u|\
 	asus,zenwifi-bt8|\
 	asus,zenwifi-bt8-ubootmod|\
