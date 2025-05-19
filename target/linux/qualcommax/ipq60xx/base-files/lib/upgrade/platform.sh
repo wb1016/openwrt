@@ -113,6 +113,8 @@ platform_do_upgrade() {
 	glinet,gl-ax1800|\
 	glinet,gl-axt1800|\
 	netgear,wax214|\
+	netgear,wax610|\
+	netgear,wax610y|\
 	qihoo,360v6)
 		nand_do_upgrade "$1"
 		;;
@@ -131,7 +133,8 @@ platform_do_upgrade() {
 		fw_setenv auto_recovery yes
 		nand_do_upgrade "$1"
 		;;
-	tplink,eap610-outdoor)
+	tplink,eap610-outdoor|\
+	tplink,eap623od-hd-v1)
 		tplink_do_upgrade "$1"
 		;;
 	yuncore,fap650)

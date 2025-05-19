@@ -366,6 +366,18 @@ define Device/jotale_js76x8-32m
 endef
 TARGET_DEVICES += jotale_js76x8-32m
 
+define Device/keenetic_kn-1221
+  BLOCKSIZE := 64k
+  IMAGE_SIZE := 29440k
+  DEVICE_VENDOR := Keenetic
+  DEVICE_MODEL := KN-1221
+  DEVICE_PACKAGES := kmod-usb2
+  IMAGES += factory.bin
+  IMAGE/factory.bin := $$(sysupgrade_bin) | pad-to $$$$(BLOCKSIZE) | \
+	check-size 14720k | zyimage -d 0x801221 -v "KN-1221"
+endef
+TARGET_DEVICES += keenetic_kn-1221
+
 define Device/keenetic_kn-1613
   IMAGE_SIZE := 15073280
   DEVICE_VENDOR := Keenetic
@@ -475,6 +487,20 @@ define Device/mercury_mac1200r-v2
   SUPPORTED_DEVICES += mac1200rv2
 endef
 TARGET_DEVICES += mercury_mac1200r-v2
+
+define Device/mercusys_mb130-4g-v1
+$(Device/tplink-v2)
+  IMAGE_SIZE := 14912k
+  DEVICE_VENDOR := MERCUSYS
+  DEVICE_MODEL := MB130-4G
+  DEVICE_VARIANT := v1
+  DEVICE_PACKAGES := kmod-mt76x0e kmod-usb2 kmod-mt7663-firmware-ap kmod-mt7615e \
+                     kmod-usb-serial-option kmod-usb-net-cdc-ether
+  TPLINK_FLASHLAYOUT := 16MLmtk
+  IMAGES := sysupgrade.bin tftp-recovery.bin
+  IMAGE/tftp-recovery.bin := pad-extra 128k | $$(IMAGE/factory.bin)
+endef
+TARGET_DEVICES += mercusys_mb130-4g-v1
 
 define Device/minew_g1-c
   IMAGE_SIZE := 15744k
