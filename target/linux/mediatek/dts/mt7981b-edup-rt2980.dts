@@ -97,14 +97,14 @@
 	mdio: mdio-bus {
 		compatible = "mediatek,ethsys-mdio";
 		#address-cells = <1>;
-		#size-cells = <1>;
+		#size-cells = <0>;
 	};
 };
 
 &mdio_bus {
 	switch: switch@1f {
 		compatible = "mediatek,mt7531";
-		reg = <0x31>;
+		reg = <0x1f>;
 		/* Reset GPIO polarity might differ, check board schematics if possible. Assuming ACTIVE_HIGH based on template */
 		reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
 		interrupt-controller;
