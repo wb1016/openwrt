@@ -23,8 +23,8 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-		bootargs-append = " console=ttyS0,115200n1 root=/dev/fit0 rootwait";
-		// bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
+		// bootargs-append = " console=ttyS0,115200n1 root=/dev/fit0 rootwait";
+		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
 	};
 
 	memory {
@@ -93,12 +93,13 @@
 		};
 	};
 
-	gmac1: mac@1 {
+// comment out as assuming wan port is on the MT7531
+/*	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
 		phy-handle = <&int_gbe_phy>;
-	};
+	};*/
 
 	mdio: mdio-bus {
 		compatible = "mediatek,ethsys-mdio";
