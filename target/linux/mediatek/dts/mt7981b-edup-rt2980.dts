@@ -9,7 +9,7 @@
 
 / {
     model = "EDUP RT2980";
-    compatible = "edup,rt2980", "mediatek,mt7981";
+    compatible = "edup,rt2980", "clt,r30b1", "mediatek,mt7981";
 
     aliases {
         serial0 = &uart0;
