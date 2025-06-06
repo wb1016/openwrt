@@ -23,7 +23,7 @@
 
 	chosen {
 		stdout-path = "serial0:115200n8";
-		// bootargs-append = " console=ttyS0,115200n1 root=/dev/fit0 rootwait";
+		// bootargs-append = "console=ttyS0,115200n1 root=/dev/fit0 rootwait";
 		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
 	};
 
