@@ -92,6 +92,7 @@ define Build/inteno-y3-header
 endef
 
 define Build/inteno-bootfs
+	rm -rf $@.ubifs-dir
 	mkdir -p $@.ubifs-dir/boot
 
 	# populate the boot fs with the dtb and the kernel image
@@ -100,7 +101,6 @@ define Build/inteno-bootfs
 
 	# create ubifs
 	$(STAGING_DIR_HOST)/bin/mkfs.ubifs ${MKUBIFS_OPTS} -r $@.ubifs-dir/ -o $@.new
-	rm -rf $@.ubifs-dir
 	mv $@.new $@
 endef
 
@@ -768,6 +768,16 @@ define Device/cudy_wr2100
 endef
 TARGET_DEVICES += cudy_wr2100
 
+define Device/cudy_r700
+  $(Device/dsa-migration)
+  DEVICE_VENDOR := Cudy
+  DEVICE_MODEL := R700
+  IMAGE_SIZE := 15872k
+  UIMAGE_NAME := R29
+  DEVICE_PACKAGES := -uboot-envtools
+endef
+TARGET_DEVICES += cudy_r700
+
 define Device/cudy_x6-v1
   $(Device/dsa-migration)
   IMAGE_SIZE := 32256k
@@ -1301,10 +1311,11 @@ define Device/elecom_wrc-x1800gs
   $(Device/nand)
   DEVICE_VENDOR := ELECOM
   DEVICE_MODEL := WRC-X1800GS
-  KERNEL := kernel-bin | lzma | \
+  KERNEL_LOADADDR := 0x82000000
+  KERNEL := kernel-bin | relocate-kernel $(loadaddr-y) | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb | \
 	znet-header 4.04(XVF.1)b90 COMC 0x68 | elecom-product-header WRC-X1800GS
-  KERNEL_INITRAMFS := kernel-bin | lzma | \
+  KERNEL_INITRAMFS := kernel-bin | relocate-kernel $(loadaddr-y) | lzma | \
 	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb
   KERNEL_SIZE := 8192k
   IMAGE_SIZE := 51456k
@@ -1403,13 +1414,15 @@ define Device/genexis_pulse-ex400/common
     --log-lebs=2 --space-fixup --squash-uids
   KERNEL := kernel-bin | lzma | uImage lzma
   KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | uImage lzma
+ifneq ($(CONFIG_TARGET_ROOTFS_INITRAMFS),)
   IMAGES += factory.bin
   IMAGE/factory.bin := append-image-stage initramfs-kernel.bin | \
 	inteno-bootfs | inteno-y3-header EX400 | append-md5sum-ascii-salted
-  IMAGE/sysupgrade.bin := append-kernel | inteno-bootfs | \
+endif
+  IMAGE/sysupgrade.bin := append-kernel | inteno-bootfs | pad-to 10M | \
     sysupgrade-tar kernel=$$$$@ | check-size | append-metadata
   DEVICE_IMG_NAME = $$(DEVICE_IMG_PREFIX)-$$(2)
-  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware kmod-usb3
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615-firmware kmod-usb3 kmod-keyboard-sx951x kmod-button-hotplug
 endef
 
 define Device/genexis_pulse-ex400
@@ -2094,6 +2107,18 @@ define Device/mikrotik_routerboard-m33g
 endef
 TARGET_DEVICES += mikrotik_routerboard-m33g
 
+define Device/mofinetwork_mofi5500-5gxelte
+  $(Device/dsa-migration)
+  $(Device/uimage-lzma-loader)
+  IMAGE_SIZE := 27656k
+  DEVICE_VENDOR := MoFi Network
+  DEVICE_MODEL := MOFI5500-5GXeLTE
+  DEVICE_PACKAGES := kmod-usb3 kmod-mmc-mtk kmod-mt7615-firmware \
+	kmod-usb-net-qmi-wwan kmod-usb-net-cdc-mbim
+  SUPPORTED_DEVICES += mofi5500 # Needed in order to flash through Mofi stock firmware
+endef
+TARGET_DEVICES += mofinetwork_mofi5500-5gxelte
+
 define Device/mqmaker_witi
   $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)
@@ -2552,7 +2577,7 @@ define Device/sercomm_na502s
   DEVICE_VENDOR := SERCOMM
   DEVICE_MODEL := NA502S
   DEVICE_PACKAGES := kmod-mt76x2 kmod-mt7603 kmod-usb3 kmod-usb-serial \
-		kmod-usb-serial-xr_usb_serial_common -uboot-envtools
+		kmod-usb-serial-xr -uboot-envtools
 endef
 TARGET_DEVICES += sercomm_na502s
 
