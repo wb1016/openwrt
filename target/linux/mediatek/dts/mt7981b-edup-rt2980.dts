@@ -25,7 +25,7 @@
     chosen {
         stdout-path = "serial0:115200n8";
 		// bootargs-append = "console=ttyS0,115200n1";
-		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000 ubi.mtd=ubi root=ubi0:rootfs rootfstype=squashfs";
+		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000 ubi.mtd=ubi";
 	};
 
 
