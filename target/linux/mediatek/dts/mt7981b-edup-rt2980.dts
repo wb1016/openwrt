@@ -25,7 +25,7 @@
     chosen {
         stdout-path = "serial0:115200n8";
 		// bootargs-append = "console=ttyS0,115200n1";
-		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000,root=/dev/fit0";
+		bootargs = "console=ttyS0,115200n1 loglevel=8 earlycon=uart8250,mmio32,0x11002000 ubi.mtd=ubi";
 	};
 
 
@@ -87,72 +87,24 @@
 		};
 	};
 
-// comment out as assuming wan port is on the MT7531
-/*	gmac1: mac@1 {
+	gmac1: mac@1 {
 		compatible = "mediatek,eth-mac";
 		reg = <1>;
 		phy-mode = "gmii";
 		phy-handle = <&int_gbe_phy>;
-	};*/
-
-	mdio: mdio-bus {
-		compatible = "mediatek,ethsys-mdio";
-		#address-cells = <1>;
-		#size-cells = <0>;
 	};
+
 };
 
 &mdio_bus {
 	switch: switch@1f {
 		compatible = "mediatek,mt7531";
-		reg = <0x1f>;
-		/* Reset GPIO polarity might differ, check board schematics if possible. Assuming ACTIVE_HIGH based on template */
+		reg = <31>;
 		reset-gpios = <&pio 39 GPIO_ACTIVE_HIGH>;
 		interrupt-controller;
 		#interrupt-cells = <1>;
 		interrupt-parent = <&pio>;
 		interrupts = <38 IRQ_TYPE_LEVEL_HIGH>;
-		status = "okay";
-
-		ports {
-			#address-cells = <1>;
-			#size-cells = <0>;
-
-			port@0 {
-				reg = <0>;
-				label = "lan1";
-			};
-
-			port@1 {
-				reg = <1>;
-				label = "lan2";
-			};
-
-			port@2 {
-				reg = <2>;
-				label = "lan3";
-			};
-
-			wan: port@3 {
-				reg = <3>;
-				label = "wan";
-				/* MAC address from factory if available */
-				nvmem-cell-names = "mac-address";
-				nvmem-cells = <&macaddr_factory_4 (-2)>;
-			};
-
-			port@6 {
-				reg = <6>;
-				ethernet = <&gmac0>;
-				phy-mode = "2500base-x";
-
-				fixed-link {
-					speed = <2500>;
-					full-duplex;
-					pause;
-				};
-			};
-		};
 	};
 };
 
@@ -233,21 +185,52 @@
 				read-only;
 			};
 
+			// FIXED: Match immortalwrt-112m layout from U-Boot
 			partition@580000 {
 				label = "ubi";
-				reg = <0x0580000 0x4000000>;
-				compatible = "linux,ubi";
-
-				volumes {
-					ubi_rootdisk: ubi-volume-fit {
-						volname = "fit";
-					};
-				};
+				reg = <0x0580000 0x7000000>;
 			};
 
+			// REMOVED: data partition doesn't exist in immortalwrt-112m layout
+			/*
 			partition@4580000 {
 				label = "data";
 				reg = <0x4580000 0x2000000>;
+			};
+			*/
+		};
+	};
+};
+
+&switch {
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+			label = "lan1";
+		};
+
+		port@1 {
+			reg = <1>;
+			label = "lan2";
+		};
+
+		port@2 {
+			reg = <2>;
+			label = "lan3";
+		};
+
+		port@6 {
+			reg = <6>;
+			ethernet = <&gmac0>;
+			phy-mode = "2500base-x";
+
+			fixed-link {
+				speed = <2500>;
+				full-duplex;
+				pause;
 			};
 		};
 	};

@@ -124,6 +124,7 @@ define Device/edup_rt2980
   DEVICE_DTS := mt7981b-edup-rt2980
   DEVICE_DTS_DIR := ../dts
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-mt76
+  SUPPORTED_DEVICES := edup,rt2980 clt,r30b1
   UBINIZE_OPTS := -E 5
   BLOCKSIZE := 128k
   PAGESIZE := 2048
