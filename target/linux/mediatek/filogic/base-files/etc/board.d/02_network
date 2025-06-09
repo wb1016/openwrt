@@ -10,6 +10,8 @@ mediatek_setup_interfaces()
 	case $board in
 	abt,asr3000|\
 	cmcc,rax3000m|\
+        edup,rt2980|\
+        edup,rt2980n|\
 	h3c,magic-nx30-pro|\
 	netis,nx31|\
 	nokia,ea0326gmp|\
@@ -31,8 +33,6 @@ mediatek_setup_interfaces()
 	arcadyan,mozart)
 		ucidef_set_interfaces_lan_wan "lan0 eth1" eth2
 		;;
-	edup,rt2980|\
-	edup,rt2980n|\
 	asus,rt-ax52|\
 	asus,rt-ax59u|\
 	asus,zenwifi-bt8|\
@@ -165,6 +165,7 @@ mediatek_setup_macs()
 
 	case $board in
 	edup,rt2980)
+		local part_name="Factory"
 		lan_mac=$(mtd_get_mac_binary $part_name 0x2A)
 		wan_mac=$(mtd_get_mac_binary $part_name 0x24)
 		label_mac=$lan_mac
