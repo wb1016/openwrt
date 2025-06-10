@@ -53,7 +53,7 @@
 
 		led_status_green: green {
 			label = "led_green";
-			gpios = <&pio 4 GPIO_ACTIVE_LOW>;
+			gpios = <&pio 11 GPIO_ACTIVE_LOW>;
 			function = LED_FUNCTION_STATUS;
 			color = <LED_COLOR_ID_GREEN>;
 			trigger-sources = "timer";
@@ -62,7 +62,7 @@
 
 		led_status_red: red {
 			label = "led_red";
-			gpios = <&pio 5 GPIO_ACTIVE_LOW>;
+			gpios = <&pio 12 GPIO_ACTIVE_LOW>;
 			function = LED_FUNCTION_STATUS;
 			color = <LED_COLOR_ID_RED>;
 		};
